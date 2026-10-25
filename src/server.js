@@ -153,6 +153,11 @@ io.on('connection', (socket) => {
 
 
 await connectDatabase();
+app.get("/", (req, res) => {
+  res.json({
+    message: "Backend is live"
+  });
+});
 
 server.listen(env.PORT, () => {
   console.log(`EstateFlow API listening on port ${env.PORT}`);
