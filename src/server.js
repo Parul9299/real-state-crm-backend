@@ -152,13 +152,13 @@ io.on('connection', (socket) => {
 }); // Connection block yahan close hota hai
 
 
-await connectDatabase();
+
 app.get("/", (req, res) => {
   res.json({
     message: "Backend is live"
   });
 });
-
+await connectDatabase();
 server.listen(env.PORT, () => {
   console.log(`EstateFlow API listening on port ${env.PORT}`);
 });
