@@ -1,0 +1,28 @@
+{
+  "name": "estateflow-crm-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Secure REST API and Socket.IO backend for EstateFlow CRM",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "create-admin": "node src/scripts/create-admin.js",
+    "check": "node --check src/server.js && node --check src/app.js"
+  },
+  "engines": { "node": ">=20.0.0" },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.1",
+    "socket.io": "^4.8.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": { "nodemon": "^3.1.10" }
+}

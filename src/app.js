@@ -1,0 +1,42 @@
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { rateLimit } from 'express-rate-limit';
+import { env, isProduction } from './config/env.js';
+import authRoutes from './routes/auth.js';
+import propertyRoutes from './routes/properties.js';
+import leadRoutes from './routes/leads.js';
+import activityRoutes from './routes/activities.js';
+import messageRoutes from './routes/messages.js';
+import teamRoutes from './routes/team.js';
+import dashboardRoutes from './routes/dashboard.js';
+import { notFound, errorHandler } from './middleware/errors.js';
+import conversationRoutes from './routes/conversations.js';
+
+export function createApp() {
+ const app=express();
+ if(env.TRUST_PROXY>0) app.set('trust proxy',env.TRUST_PROXY);
+ app.disable('x-powered-by');
+ app.use(helmet({crossOriginResourcePolicy:{policy:'cross-origin'}}));
+ app.use(cors({origin:env.CLIENT_ORIGIN,credentials:true,methods:['GET','POST','PATCH','DELETE','OPTIONS'],allowedHeaders:['Content-Type','Authorization']}));
+ app.use(express.json({limit:'100kb',strict:true}));
+ app.use(express.urlencoded({extended:false,limit:'20kb'}));
+ app.use(cookieParser());
+ app.use((req,res,next)=>{res.setHeader('Cache-Control','no-store');next();});
+ app.get('/api/health',(_req,res)=>res.json({data:{status:'ok',service:'estateflow-api'}}));
+ const loginLimiter=rateLimit({windowMs:15*60*1000,limit:10,standardHeaders:'draft-8',legacyHeaders:false,message:{error:{message:'Too many authentication attempts. Try again later.'}}});
+ app.use('/api/auth/login',loginLimiter);
+ app.use('/api/auth/refresh',rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-8',legacyHeaders:false}));
+ app.use('/api/auth',authRoutes);
+ app.use('/api/properties',propertyRoutes);
+ app.use('/api/leads',leadRoutes);
+ app.use('/api/activities',activityRoutes);
+ app.use('/api/messages',messageRoutes);
+ app.use('/api/conversations', conversationRoutes);
+ app.use('/api/team-members',teamRoutes);
+ app.use('/api/dashboard',dashboardRoutes);
+ app.use(notFound);
+ app.use(errorHandler);
+ return app;
+}
